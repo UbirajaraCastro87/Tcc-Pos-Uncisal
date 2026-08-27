@@ -1,4 +1,3 @@
-
 # from web_project.bootstrap import TemplateBootstrap
 from web_project.template_helpers.theme import TemplateHelper
 
@@ -22,5 +21,15 @@ class TemplateLayout:
 
         # Map context variables
         TemplateHelper.map_context(context)
+
+        # --- ADICIONE ESTE BLOCO DE SEGURANÇA E DADOS DO USUÁRIO ---
+        request = context.get('request')
+        if request and request.user.is_authenticated:
+            context.update({
+                'usuario_nome': request.user.get_full_name() or request.user.username,
+                'usuario_email': request.user.email,
+                'usuario_cargo': "Administrador" if request.user.is_superuser else "Usuário",
+            })
+        # -----------------------------------------------------------
 
         return context

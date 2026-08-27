@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.contrib.auth import logout
 
 
 # ==========================================
@@ -83,3 +84,26 @@ class Auth2FAView(TemplateView):
         else:
             messages.error(request, "Código 2FA incorreto. Tente novamente.")
             return redirect(request.path)
+
+# ==========================================
+# 3. CLASSE DE LOGOUT
+# ==========================================
+
+class AuthLogoutView(TemplateView):
+    def get(self, request, *args, **kwargs):
+        # 1. Encerra a sessão oficial do Django
+        logout(request)
+
+        # 2. Limpa qualquer resíduo de sessão personalizada que tenhamos criado
+        if '2fa_token' in request.session:
+            del request.session['2fa_token']
+        if 'pre_2fa_user_id' in request.session:
+            del request.session['pre_2fa_user_id']
+
+        # 3. Dispara uma mensagem informativa de sucesso
+        messages.success(request, "Você saiu do sistema com segurança.")
+
+        print("🔒 LOGOUT REALIZADO: Sessão encerrada com sucesso.")
+
+        # 4. Redireciona estritamente de volta para a tela de login
+        return redirect('auth-login-basic')
