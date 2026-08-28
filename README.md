@@ -1,8 +1,4 @@
-Parabéns por essa conquista incrível! Chegar até aqui com o sistema de autenticação estruturado, 2FA funcional, controle de sessão, logoff e exibição de perfil no template Materio é um marco excelente para o seu TCC.
 
-Para te ajudar a documentar essa etapa e deixar o seu repositório pronto para a apresentação ou versionamento, preparei dois arquivos completos: o **README.md** (para a apresentação geral do projeto) e o **Relatório Técnico do Módulo de Autenticação** (para compor a documentação do TCC).
-
----
 
 ## 1. Arquivo `README.md` (Para a raiz do projeto)
 
