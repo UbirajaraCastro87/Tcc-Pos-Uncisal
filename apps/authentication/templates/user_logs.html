@@ -1,0 +1,58 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Logs de Acesso - Sistema TCC{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Relatórios /</span> Histórico de Acessos</h4>
+
+  <div class="card">
+    <h5 class="card-header">Auditoria de Sessões dos Usuários</h5>
+    <div class="table-responsive text-nowrap">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Usuário</th>
+            <th>Data / Hora Login</th>
+            <th>Data / Hora Logout</th>
+            <th>Tempo Ativo</th>
+            <th>Endereço IP</th>
+            <th>Navegador / Dispositivo</th>
+          </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+          {% for log in logs %}
+          <tr>
+            <td><strong>{{ log.username }}</strong></td>
+            <td>{{ log.login_time|date:"d/m/Y H:i:s" }}</td>
+            <td>
+              {% if log.logout_time %}
+                {{ log.logout_time|date:"d/m/Y H:i:s" }}
+              {% else %}
+                <span class="badge bg-label-success">Sessão Ativa</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if log.duration %}
+                {{ log.duration }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td><code>{{ log.ip_address }}</code></td>
+            <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ log.user_agent }}">
+              {{ log.user_agent }}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center p-4">Nenhum registro de acesso encontrado.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock content %}

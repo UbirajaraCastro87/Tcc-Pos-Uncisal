@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import AuthView, Auth2FAView, AuthLogoutView, AuthForgotPasswordView, AuthResetPasswordView,AuthAddUserView
+from .views import (AuthView, Auth2FAView, AuthLogoutView, AuthForgotPasswordView,
+                    AuthResetPasswordView,AuthAddUserView,UserLogsView)
 
 urlpatterns = [
     path("auth/login/", AuthView.as_view(template_name="auth_login_basic.html"), name="auth-login-basic"),
@@ -25,5 +26,11 @@ urlpatterns = [
         "auth/add_user/",
         AuthAddUserView.as_view(template_name="auth_add_user.html"),
         name="auth-add-user",
+    ),
+
+path(
+        "dashboard/logs/",
+        UserLogsView.as_view(),
+        name="user-logs",
     ),
 ]
