@@ -1,0 +1,30 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Usuário / Administrador" as User
+actor "Servidor SMTP (Gmail)" as SMTP
+
+rectangle "Sistema Web Django (TCC de Segurança)" {
+  usecase "Efetuar Login (Autenticação)" as UC1
+  usecase "Validar Autenticação 2FA\n(Código de 6 dígitos)" as UC2
+  usecase "Solicitar Recuperação de Senha\n(Esqueci minha senha)" as UC3
+  usecase "Redefinir Senha com Token\ne Hash Seguro" as UC4
+  usecase "Acessar Dashboard Protegido" as UC5
+  usecase "Encerrar Sessão (Logout)" as UC6
+}
+
+User --> UC1
+UC1 --> SMTP : Dispara token 2FA
+UC1 ..> UC2 : <<include>> (Exige)
+User --> UC2
+UC2 --> UC5 : Concede Acesso
+
+User --> UC3
+UC3 --> SMTP : Dispara token de recuperação
+UC3 ..> UC4 : <<include>> (Exige)
+User --> UC4
+
+User --> UC5
+User --> UC6
+@enduml

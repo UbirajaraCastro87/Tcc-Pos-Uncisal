@@ -18,6 +18,8 @@ from dotenv import load_dotenv
 
 from .template import  THEME_LAYOUT_DIR, THEME_VARIABLES
 
+from decouple import config
+
 load_dotenv()  # take environment variables from .env.
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,7 +44,7 @@ DEBUG = os.environ.get("DEBUG", 'True').lower() in ['true', 'yes', '1']
 
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1","*"]
 
 # Current DJANGO_ENVIRONMENT
 ENVIRONMENT = os.environ.get("DJANGO_ENVIRONMENT", default="local")
@@ -145,9 +147,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = "en"
+LANGUAGE_CODE = "pt-br"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Sao_Paulo"
 
 USE_I18N = True
 
@@ -184,3 +186,19 @@ THEME_VARIABLES = THEME_VARIABLES
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+# Configuração de E-mail
+# Em desenvolvimento local, usamos o console para não precisar de senha de app real.
+# Em produção (Oracle VPS), alteraremos para 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.email.EmailBackend'
+
+
+# Configuração de E-mail (SMTP Real com Gmail)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# O decouple lê automaticamente do arquivo .env localizado na raiz do projeto
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
