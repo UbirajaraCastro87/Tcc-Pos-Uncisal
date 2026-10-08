@@ -98,6 +98,4 @@ Para garantir que o ciclo de vida da sessão seja encerrado de forma íntegra, i
 
 ---
 
-Guarde esses textos para o seu documento de TCC! Quando quiser retomar do ponto em que paramos (seja para configurar banco PostgreSQL, e-mails reais via SMTP ou novas telas), é só me chamar. Bom descanso por hoje!
 
-```
