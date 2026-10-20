@@ -1,0 +1,27 @@
+[1mdiff --git a/.github/workflows/deploy.yml b/.github/workflows/deploy.yml[m
+[1mindex 847e5d7..73c08e1 100644[m
+[1m--- a/.github/workflows/deploy.yml[m
+[1m+++ b/.github/workflows/deploy.yml[m
+[36m@@ -3,7 +3,7 @@[m [mname: Deploy Django AWS[m
+ on:[m
+   push:[m
+     branches:[m
+[31m-      - main[m
+[32m+[m[32m      - master[m
+ [m
+ jobs:[m
+   deploy:[m
+[36m@@ -21,7 +21,7 @@[m [mjobs:[m
+           script: |[m
+             cd /home/ubuntu/Tcc-Pos-Uncisal[m
+ [m
+[31m-            git pull origin main[m
+[32m+[m[32m            git pull origin master[m
+ [m
+             source venv/bin/activate[m
+ [m
+[36m@@ -34,4 +34,3 @@[m [mjobs:[m
+             sudo systemctl restart gunicorn[m
+ [m
+             sudo systemctl restart nginx[m
+[31m-[m
