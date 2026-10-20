@@ -219,3 +219,6 @@ sqlite3 db.sqlite3 "select count(*) from auth_user;" && \
 echo "" && \
 echo "===== LOGS GUNICORN =====" && \
 sudo journalctl -u gunicorn -n 20 --no-pager
+
+###
+<img width="641" height="228" alt="image" src="https://github.com/user-attachments/assets/780caf36-85c0-41aa-89b8-e73582fd01b0" />
