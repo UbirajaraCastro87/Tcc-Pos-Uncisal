@@ -1,80 +1,76 @@
 # Sistema de Autenticação — TCC
 
-Aplicação web desenvolvida para a disciplina **Projeto Aplicado: Práticas de
-Mercado**, da Pós-Graduação em Segurança da Informação e Análise Forense da
-UNCISAL. O projeto demonstra autenticação, controle de acesso, auditoria de
-sessões e implantação automatizada.
+Aplicação web acadêmica desenvolvida para a disciplina **Projeto Aplicado:
+Práticas de Mercado**, da Pós-Graduação em Segurança da Informação e Análise
+Forense da UNCISAL. O projeto demonstra autenticação, autorização, auditoria
+de sessões e implantação automatizada.
 
 ## Aplicação
 
 - **Produção:** [https://ubirajarauncisal.duckdns.org](https://ubirajarauncisal.duckdns.org)
 - **Tecnologias:** Python, Django, SQLite, Bootstrap Materio, Gunicorn e Nginx
-- **Infraestrutura informada:** AWS EC2 com Ubuntu Server
-- **Repositório:** [UbirajaraCastro87/Tcc-Pos-Uncisal](https://github.com/UbirajaraCastro87/Tcc-Pos-Uncisal)
+- **Infraestrutura:** AWS EC2 com Ubuntu Server
+- **Código-fonte:** [UbirajaraCastro87/Tcc-Pos-Uncisal](https://github.com/UbirajaraCastro87/Tcc-Pos-Uncisal)
 
-Cada ambiente usa seu próprio banco SQLite. O banco local, arquivos `.env` e
-chaves privadas não devem ser adicionados ao Git.
+O banco SQLite local, arquivos `.env` e chaves privadas não são versionados.
+Desenvolvimento e produção mantêm seus próprios bancos e usuários.
 
 ## Funcionalidades
 
 - Login com usuário e senha.
-- Página interna e histórico de acesso protegidos por autenticação.
-- Usuários comuns consultam apenas os próprios logs; contas `staff` podem
+- Dashboard e histórico de acessos protegidos por autenticação.
+- Usuários comuns visualizam apenas seus próprios logs; contas `staff` podem
   consultar todos os registros.
 - Criação de usuários restrita a contas autenticadas com permissão `staff`.
-- Logout por POST com proteção CSRF.
-- Recuperação de senha por e-mail com código de seis dígitos, validade de
-  15 minutos e limite de cinco tentativas.
-- Senhas criadas ou redefinidas passam pelos validadores do Django e são
-  armazenadas pelo mecanismo de hash do framework.
+- Logout via POST com proteção CSRF.
+- Recuperação de senha por e-mail com código aleatório de seis dígitos,
+  validade de 15 minutos e limite de cinco tentativas.
+- Senhas criadas e redefinidas validadas pelo Django e armazenadas usando o
+  hash de senhas do framework.
 
-**A autenticação de dois fatores está desativada.** O login atualmente usa
-apenas usuário e senha; portanto, o sistema não deve ser apresentado como MFA
-ou 2FA.
+> **Autenticação de dois fatores está desativada.** O login usa somente
+> usuário e senha; não descreva o sistema como MFA/2FA.
 
 ## Controles relacionados ao OWASP Top 10:2025
 
-Esta seção descreve controles presentes no código. Ela não substitui uma
-auditoria de segurança nem comprova a configuração da infraestrutura.
+Os controles abaixo são implementados no código. Esta descrição não substitui
+auditoria independente nem comprova controles da infraestrutura.
 
 ### A01 — Broken Access Control
 
-- O painel, o cadastro e os logs exigem autenticação.
-- Apenas contas `staff` podem cadastrar usuários.
-- Os logs mostrados a uma conta comum são filtrados pelo usuário autenticado.
-- O logout altera o estado por POST e usa o middleware CSRF do Django.
+- O dashboard, a tela de cadastro e o histórico de logs exigem autenticação.
+- Apenas usuários `staff` podem cadastrar contas.
+- Usuários comuns só recebem seus próprios registros de acesso.
+- Logout é feito por POST e protegido pelo middleware CSRF do Django.
 
-**Código:** `apps/dashboards/views.py`,
-`apps/authentication/views.py` e os templates de navegação.
+**Implementação:** `apps/dashboards/views.py`,
+`apps/authentication/views.py` e templates de navegação.
 
 ### A04 — Cryptographic Failures
 
-- As senhas são armazenadas com o hash de senhas do Django.
-- Com `DEBUG=False`, cookies de sessão e CSRF usam o atributo `Secure`;
-  o cookie de sessão também usa `HttpOnly` e `SameSite=Lax`.
-- A aplicação habilita redirecionamento HTTPS e HSTS por padrão em produção.
-- Gunicorn está configurado para escutar em `127.0.0.1:5005`; o proxy Nginx
-  deve encaminhar corretamente o cabeçalho `X-Forwarded-Proto`.
+- As senhas são armazenadas usando o mecanismo de hash do Django.
+- Com `DEBUG=False`, cookies de sessão e CSRF usam o atributo `Secure`.
+  O cookie de sessão também usa `HttpOnly` e `SameSite=Lax`.
+- Redirecionamento HTTPS e HSTS são habilitados por padrão em produção.
+- Gunicorn deve escutar somente em loopback, atrás do Nginx.
 
-**Código:** `config/settings.py` e `gunicorn-cfg.py`. Certificado, Nginx,
-redirecionamento HTTP, renovação TLS e resultados de testes PQC precisam ser
-verificados no servidor.
+**Implementação:** `config/settings.py` e `gunicorn-cfg.py`. A validade do
+certificado, a configuração efetiva do Nginx e testes TLS/PQC precisam ser
+verificados no ambiente publicado.
 
 ### A07 — Authentication Failures
 
 - O login usa `authenticate()` e `login()` do Django.
-- A recuperação de senha usa código gerado com `secrets`, expira após
-  15 minutos e é invalidada após cinco tentativas incorretas.
-- As solicitações de recuperação recebem uma resposta genérica, sem informar
-  se o e-mail existe.
-- A criação e a redefinição de senha aplicam os validadores do Django.
-- O logout encerra a sessão do usuário.
+- Códigos de recuperação são gerados por `secrets`, expiram em 15 minutos e
+  são invalidados após cinco tentativas incorretas.
+- A resposta ao pedido de recuperação não informa se o e-mail está cadastrado.
+- Cadastro e redefinição de senha aplicam os validadores do Django.
+- O logout encerra a sessão autenticada.
 
-**Código:** `apps/authentication/views.py` e `config/settings.py`.
-O login não tem segundo fator nem limitação específica de tentativas; esses
-riscos residuais devem ser considerados na avaliação.
+**Implementação:** `apps/authentication/views.py` e `config/settings.py`.
+O login não possui segundo fator nem limitação específica de tentativas.
 
-## Configuração local
+## Executar localmente
 
 Requer Python compatível com Django 5.2. As dependências estão listadas em
 `requirements.txt`.
@@ -107,19 +103,19 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-Acesse `http://127.0.0.1:8000/auth/login/`. O arquivo `.env.example` serve de
-modelo e pode ser copiado para `.env`; não coloque valores secretos nele.
-Em desenvolvimento, `DEBUG=True` permite usar o backend de e-mail de console
-quando não há credenciais SMTP configuradas.
+Acesse `http://127.0.0.1:8000/auth/login/`. `.env.example` é apenas um
+modelo; copie-o para `.env` e não preencha o modelo com segredos. Em
+desenvolvimento, `DEBUG=True` permite usar o backend de e-mail de console
+quando não há credenciais SMTP.
 
-Em produção, configure no `.env` do servidor uma `SECRET_KEY` forte e
-persistente, `DEBUG=False`, `ALLOWED_HOSTS`, credenciais SMTP
-(`EMAIL_HOST_USER` e `EMAIL_HOST_PASSWORD`) e, se necessário,
-`CSRF_TRUSTED_ORIGINS`. Sem chave secreta ou credenciais SMTP em modo de
-produção, a aplicação interrompe a inicialização. Nunca publique `.env`,
-senhas ou chaves privadas.
+Em produção, configure no `.env` privado do servidor uma `SECRET_KEY` forte e
+persistente, `DEBUG=False`, `ALLOWED_HOSTS` e credenciais SMTP
+(`EMAIL_HOST_USER` e `EMAIL_HOST_PASSWORD`). Configure também
+`CSRF_TRUSTED_ORIGINS` se necessário. O servidor exige chave secreta e
+credenciais SMTP em modo de produção. Nunca publique `.env`, senhas ou chaves
+privadas.
 
-## Testes e verificações Django
+## Testes e verificações
 
 ```bash
 python manage.py test apps.authentication.tests
@@ -127,111 +123,80 @@ python manage.py check
 python manage.py check --deploy
 ```
 
-`check --deploy` deve ser executado com as variáveis de produção configuradas.
-Revise cada aviso considerando o proxy reverso e a configuração real do
-servidor. HSTS para subdomínios e preload não são habilitados automaticamente;
-ative-os somente após confirmar os requisitos para todos os subdomínios.
+Execute `check --deploy` com as variáveis de produção. Analise os avisos
+considerando a configuração real do proxy e do servidor. HSTS para
+subdomínios e preload não são ativados automaticamente: habilite-os somente
+depois de verificar os requisitos de todos os subdomínios e da política de
+preload.
 
-## Deploy com GitHub Actions
+## Deploy — GitHub Actions
 
-O workflow `.github/workflows/deploy.yml` é acionado por push para `master`.
-Ele conecta à EC2 por SSH, atualiza o código, garante uma `SECRET_KEY` e
-`DEBUG=False` no `.env`, instala dependências, aplica migrations, coleta
-arquivos estáticos e reinicia Gunicorn e Nginx.
+`.github/workflows/deploy.yml` inicia o deploy após push para `master`. O
+workflow conecta à EC2 por SSH, atualiza o código, garante uma `SECRET_KEY`
+persistente e `DEBUG=False` no `.env`, instala dependências, aplica migrations,
+coleta estáticos e reinicia Gunicorn e Nginx.
 
-Configure os segredos `EC2_HOST`, `EC2_USER` e `EC2_SSH_KEY` em **Settings →
-Secrets and variables → Actions**. Configure também as credenciais SMTP no
-`.env` existente no servidor; o workflow não copia o `.env` local.
-A chave SSH privada deve ser mantida em segredo e nunca commitada ou enviada
-em mensagens.
+Configure os GitHub Actions Secrets `EC2_HOST`, `EC2_USER` e `EC2_SSH_KEY`.
+As credenciais SMTP devem existir no `.env` privado do servidor; o workflow
+não copia o `.env` local. A chave privada SSH deve ficar apenas no GitHub
+Secrets e nunca ser commitada ou compartilhada.
 
-O roteiro da disciplina menciona a branch `main`; este repositório configura o
-deploy pela branch `master`. Confirme com o professor se essa diferença é
-aceita.
+O roteiro da disciplina menciona a branch `main`, enquanto este workflow usa
+`master`. Confirme com o professor se essa diferença é aceita.
 
-## Evidências e itens de infraestrutura
+## Evidências anexadas
 
-Em uma verificação no servidor registrada em **20/10/2026**, foram observados
-Ubuntu Server 26.04.1 LTS, serviços Nginx e Gunicorn ativos, jail `sshd` do
-Fail2Ban ativo e resposta HTTPS do domínio. O Gunicorn estava escutando em
-`127.0.0.1:8000`, endereço configurado pelo serviço systemd; a configuração
-`gunicorn-cfg.py` do repositório usa `127.0.0.1:5005`, portanto os dois
-valores precisam ser reconciliados antes de afirmar que a configuração do
-arquivo é a usada em produção.
+As imagens abaixo foram fornecidas para documentar o ambiente em **20/10/2026**.
+Elas comprovam apenas o que está visível nas capturas, não todos os controles
+de segurança descritos no roteiro acadêmico.
 
-A captura abaixo e a saída de comandos coletadas no servidor são evidências
-pontuais, não uma auditoria completa:
+### Acesso SSH ao servidor
 
-![Evidência de verificação do ambiente](https://github.com/user-attachments/assets/780caf36-85c0-41aa-89b8-e73582fd01b0)
+A captura registra uma conexão SSH bem-sucedida com a instância Ubuntu
+26.04.1 LTS usando uma chave. Ela não comprova, por si só, que a autenticação
+SSH por senha esteja desabilitada ou que as regras de firewall estejam
+restritas.
 
-Itens que ainda precisam de comprovação específica:
+![Sessão SSH conectada ao servidor Ubuntu](Documenta%C3%A7%C3%A3o/evidencias/acesso-ssh-ubuntu.png)
 
-- [ x] Regras do firewall/Security Group: somente portas necessárias abertas.
-- [ x] SSH por chave, autenticação SSH por senha desabilitada e configuração
-  Fail2Ban com quatro tentativas e banimento de 24 horas.
-- [ x] Redirecionamento automático de HTTP para HTTPS e renovação automática
-  do certificado.
-- [x ] Resultado exigido pelo professor nos verificadores TLS e PQC.
-- [ x] Compatibilidade da branch `master` com a exigência de deploy pela `main`.
-- [x ] Evidência do uso de Antigravity ou de ambiente de desenvolvimento com IA
-  equivalente, conforme o roteiro da disciplina.
-- [x ] Confirmação de que nenhum `.env`, segredo, chave privada ou banco local
-  está versionado.
+### GitHub Actions Secrets
 
-Não publique logs brutos de terminal que revelem endereços, nomes de usuários,
-estado de segurança ou detalhes operacionais do servidor. Guarde as evidências
-completas para apresentação privada ao professor.
+A captura confirma que existem entradas chamadas `EC2_HOST`, `EC2_SSH_KEY` e
+`EC2_USER` nos Secrets do repositório. O GitHub oculta os valores; a imagem não
+comprova sua validade nem o sucesso de uma execução do deploy.
+
+![Nomes dos GitHub Actions Secrets configurados](Documenta%C3%A7%C3%A3o/evidencias/secrets-github-actions.png)
+
+## Verificações pendentes para a entrega
+
+Os itens seguintes precisam de evidência adicional antes de serem marcados
+como concluídos:
+
+- [ ] Security Group/firewall libera somente as portas necessárias.
+- [ ] SSH por chave, login SSH por senha desabilitado e Fail2Ban configurado
+  com quatro tentativas e banimento por 24 horas.
+- [ ] Redirecionamento HTTP para HTTPS e renovação automática do certificado.
+- [ ] Testes TLS exigidos pelo professor e verificação de PQC.
+- [ ] Execução do GitHub Actions concluída com sucesso para a versão final.
+- [ ] Professor confirma que `master` atende ao requisito de deploy pela `main`.
+- [ ] Evidência do uso do Antigravity ou de IDE equivalente com IA.
+- [ ] Conferência final confirma que não há banco SQLite local, `.env`,
+  credenciais ou chaves privadas no repositório.
+
+Uma saída de comandos compartilhada durante a conversa também registrou
+serviços Nginx e Gunicorn ativos e a jail `sshd` do Fail2Ban ativa. Naquela
+verificação, o serviço systemd iniciava o Gunicorn em `127.0.0.1:8000`,
+enquanto `gunicorn-cfg.py` neste repositório define `127.0.0.1:5005`.
+Confirme qual configuração é usada pelo serviço de produção antes de apresentar
+essa parte como evidência final. A consulta HTTPS retornou HTTP 302, mas não
+foi uma prova do redirecionamento de HTTP para HTTPS.
+
+Evite publicar logs brutos de terminal: eles podem expor endereços, nomes de
+usuário, dados operacionais ou outras informações desnecessárias. As capturas
+de evidência foram copiadas para `Documentação/evidencias/`; os anexos
+originais não foram alterados.
 
 ## Autor
 
 **Ubirajara Rodrigo Castro** — Pós-Graduação em Segurança da Informação e
 Análise Forense, UNCISAL.
-
-
-#### Comando para verificação 
-
-
-echo "===== SERVIDOR =====" && \
-hostname && \
-echo "" && \
-echo "===== SISTEMA OPERACIONAL =====" && \
-cat /etc/os-release | head -5 && \
-echo "" && \
-echo "===== NGINX =====" && \
-sudo systemctl status nginx --no-pager | head -10 && \
-echo "" && \
-echo "===== GUNICORN =====" && \
-sudo systemctl status gunicorn --no-pager | head -15 && \
-echo "" && \
-echo "===== FAIL2BAN =====" && \
-sudo fail2ban-client status sshd && \
-echo "" && \
-echo "===== DOMINIO =====" && \
-curl -I https://ubirajarauncisal.duckdns.org 2>/dev/null | head -5 && \
-echo "" && \
-echo "===== PORTA 8000 =====" && \
-sudo ss -tulpn | grep 8000 && \
-echo "" && \
-echo "===== GUNICORN PROCESSOS =====" && \
-ps aux | grep gunicorn | grep -v grep && \
-echo "" && \
-echo "===== GIT ULTIMOS COMMITS =====" && \
-cd ~/Tcc-Pos-Uncisal && git log --oneline -5 && \
-echo "" && \
-echo "===== WORKFLOW CI/CD =====" && \
-cat .github/workflows/deploy.yml && \
-echo "" && \
-echo "===== PYTHON =====" && \
-source .venv/bin/activate && python --version && \
-echo "" && \
-echo "===== MIGRATIONS =====" && \
-python manage.py showmigrations | tail -20 && \
-echo "" && \
-echo "===== USUARIOS =====" && \
-python manage.py shell -c "from django.contrib.auth.models import User; print('TOTAL DE USUARIOS:', User.objects.count())" && \
-echo "" && \
-echo "===== BANCO SQLITE =====" && \
-sqlite3 db.sqlite3 "select count(*) from auth_user;" && \
-echo "" && \
-echo "===== LOGS GUNICORN =====" && \
-sudo journalctl -u gunicorn -n 20 --no-pager
