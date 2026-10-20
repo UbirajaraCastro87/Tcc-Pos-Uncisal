@@ -160,7 +160,7 @@ ser comprovados separadamente:
   por senha desabilitada.
 - [x] Fail2Ban na porta 22 com quatro tentativas e banimento de 24 horas.
 - [x] Nginx redireciona HTTP para HTTPS; certificado e renovação automática
-  verificados.
+  verificados..
 - [x] Resultado exigido pelo professor nos verificadores TLS e PQC.
 - [x] Execução de deploy do GitHub Actions concluída com sucesso.
 - [x] Evidências de uso do VSCode ou de ambiente de desenvolvimento com IA equivalente.
