@@ -1,4 +1,4 @@
-# Sistema de autenticação — TCC
+<img width="1784" height="2268" alt="image" src="https://github.com/user-attachments/assets/0a95a53b-1ec1-4e9f-a575-eaec6b6fd561" /># Sistema de autenticação — TCC
 
 Aplicação web desenvolvida para a disciplina **Projeto Aplicado: Práticas de
 Mercado** da Pós-Graduação em Segurança da Informação e Análise Forense da
@@ -220,5 +220,211 @@ echo "" && \
 echo "===== LOGS GUNICORN =====" && \
 sudo journalctl -u gunicorn -n 20 --no-pager
 
+===== SERVIDOR =====
+ip-172-31-24-71
+
+===== SISTEMA OPERACIONAL =====
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+VERSION="26.04.1 LTS (Resolute Raccoon)"
+VERSION_CODENAME=resolute
+
+===== NGINX =====
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-10-20 16:21:27 UTC; 3min 11s ago
+ Invocation: 8f513ad09af7455fa92622cf20a3ac3c
+       Docs: man:nginx(8)
+    Process: 48149 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+    Process: 48151 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+   Main PID: 48152 (nginx)
+      Tasks: 3 (limit: 627)
+     Memory: 4.2M (peak: 5.1M)
+
+===== GUNICORN =====
+● gunicorn.service - Gunicorn daemon para o TCC Pos Uncisal
+     Loaded: loaded (/etc/systemd/system/gunicorn.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-10-20 16:21:27 UTC; 3min 12s ago
+ Invocation: 264ad2402f0a449d90d608fa43d3d0d1
+   Main PID: 48143 (gunicorn)
+      Tasks: 4 (limit: 627)
+     Memory: 119.6M (peak: 119.6M)
+        CPU: 2.356s
+     CGroup: /system.slice/gunicorn.service
+             ├─48143 /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/python /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 config.wsgi:application
+             ├─48156 /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/python /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 config.wsgi:application
+             ├─48158 /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/python /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 config.wsgi:application
+             └─48159 /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/python /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 config.wsgi:application
+
+Oct 20 16:21:27 ip-172-31-24-71 systemd[1]: Started gunicorn.service - Gunicorn daemon para o TCC Pos Uncisal.
+
+===== FAIL2BAN =====
+Status for the jail: sshd
+|- Filter
+|  |- Currently failed: 0
+|  |- Total failed:     7
+|  `- Journal matches:  _SYSTEMD_UNIT=ssh.service + _COMM=sshd
+`- Actions
+   |- Currently banned: 1
+   |- Total banned:     1
+   `- Banned IP list:   161.129.211.63
+
+===== DOMINIO =====
+HTTP/1.1 302 Found
+Server: nginx/1.28.3 (Ubuntu)
+Date: Tue, 20 Oct 2026 16:24:40 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 0
+
+===== PORTA 8000 =====
+tcp   LISTEN 0      2048           127.0.0.1:8000      0.0.0.0:*    users:(("gunicorn",pid=48159,fd=5),("gunicorn",pid=48158,fd=5),("gunicorn",pid=48156,fd=5),("gunicorn",pid=48143,fd=5))
+
+===== GUNICORN PROCESSOS =====
+root       45902  0.0  0.5  12576  4984 pts/0    S+   14:00   0:00 sudo journalctl -u gunicorn -f
+root       45905  0.0  0.1  12576  1700 pts/1    Ss   14:00   0:00 sudo journalctl -u gunicorn -f
+root       45906  0.0  1.2  36288 11240 pts/1    S+   14:00   0:00 journalctl -u gunicorn -f
+ubuntu     48143  0.0  2.6  38196 24848 ?        Ss   16:21   0:00 /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/python /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 config.wsgi:application
+ubuntu     48156  0.4  5.5  65540 51872 ?        S    16:21   0:00 /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/python /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 config.wsgi:application
+ubuntu     48158  0.4  5.6  65964 52188 ?        S    16:21   0:00 /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/python /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 config.wsgi:application
+ubuntu     48159  0.1  5.3  65076 50216 ?        S    16:21   0:00 /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/python /home/ubuntu/Tcc-Pos-Uncisal/.venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 config.wsgi:application
+
+===== GIT ULTIMOS COMMITS =====
+8c11855 (HEAD -> master, origin/master, origin/HEAD) video
+4c29ec1 leia 2
+1a06b00 leia
+1ee0d41 login sem 2fa
+c5dbc94 Teste SSH Key
+
+===== WORKFLOW CI/CD =====
+name: Deploy Django AWS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy na EC2
+        uses: appleboy/ssh-action@v1.2.0
+
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            cd /home/ubuntu/Tcc-Pos-Uncisal
+
+            git pull origin master
+
+            touch .env
+            if ! grep -qE '^[[:space:]]*SECRET_KEY[[:space:]]*=[[:space:]]*[^[:space:]]' .env; then
+              printf '\nSECRET_KEY=%s\n' "$(openssl rand -hex 48)" >> .env
+            fi
+            if grep -qE '^[[:space:]]*DEBUG[[:space:]]*=' .env; then
+              sed -i -E 's/^[[:space:]]*DEBUG[[:space:]]*=.*/DEBUG=False/' .env
+            else
+              printf '\nDEBUG=False\n' >> .env
+            fi
+            chmod 600 .env
+
+            source .venv/bin/activate
+
+            pip install -r requirements.txt
+
+            python manage.py migrate --noinput
+
+            python manage.py collectstatic --noinput
+
+            sudo systemctl restart gunicorn
+            sudo systemctl restart nginx
+
+            
+
+            echo "Deploy realizado com sucesso"
+===== PYTHON =====
+Python 3.14.4
+
+===== MIGRATIONS =====
+dashboards
+ (no migrations)
+extended_ui
+ (no migrations)
+form_layouts
+ (no migrations)
+forms
+ (no migrations)
+icons
+ (no migrations)
+layouts
+ (no migrations)
+pages
+ (no migrations)
+sessions
+ [X] 0001_initial
+tables
+ (no migrations)
+ui
+ (no migrations)
+
+===== USUARIOS =====
+7 objects imported automatically (use -v 2 for details).
+
+TOTAL DE USUARIOS: 3
+
+===== BANCO SQLITE =====
+3
+
+===== LOGS GUNICORN =====
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[47830]: ('Loading TemplateBootstrapLayoutVertical from '
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[47830]:  'templates.layout.bootstrap.layout_vertical')
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[47830]: 'Loading TemplateBootstrapSystem from templates.layout.bootstrap.system'
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[47830]: ('Loading TemplateBootstrapLayoutVertical from '
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[47830]:  'templates.layout.bootstrap.layout_vertical')
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[47830]: 'Loading TemplateBootstrapSystem from templates.layout.bootstrap.system'
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[47830]: ('Loading TemplateBootstrapLayoutVertical from '
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[47830]:  'templates.layout.bootstrap.layout_vertical')
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[47830]: 'Loading TemplateBootstrapSystem from templates.layout.bootstrap.system'
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[47814]: [2026-10-20 16:21:27 +0000] [47814] [INFO] Shutting down: Master
+Oct 20 16:21:27 ip-172-31-24-71 systemd[1]: gunicorn.service: Deactivated successfully.
+Oct 20 16:21:27 ip-172-31-24-71 systemd[1]: Stopped gunicorn.service - Gunicorn daemon para o TCC Pos Uncisal.
+Oct 20 16:21:27 ip-172-31-24-71 systemd[1]: gunicorn.service: Consumed 4.274s CPU time over 40min 32.395s wall clock time, 121.8M memory peak.
+Oct 20 16:21:27 ip-172-31-24-71 systemd[1]: Started gunicorn.service - Gunicorn daemon para o TCC Pos Uncisal.
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[48143]: [2026-10-20 16:21:27 +0000] [48143] [INFO] Starting gunicorn 23.0.0
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[48143]: [2026-10-20 16:21:27 +0000] [48143] [INFO] Listening at: http://127.0.0.1:8000 (48143)
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[48143]: [2026-10-20 16:21:27 +0000] [48143] [INFO] Using worker: sync
+Oct 20 16:21:27 ip-172-31-24-71 gunicorn[48156]: [2026-10-20 16:21:27 +0000] [48156] [INFO] Booting worker with pid: 48156
+Oct 20 16:21:28 ip-172-31-24-71 gunicorn[48158]: [2026-10-20 16:21:28 +0000] [48158] [INFO] Booting worker with pid: 48158
+Oct 20 16:21:28 ip-172-31-24-71 gunicorn[48159]: [2026-10-20 16:21:28 +0000] [48159] [INFO] Booting worker with pid: 48159
+(.venv) ubuntu@ip-172-31-24-71:~/Tcc-Pos-Uncisal$ 
+
 ###
 <img width="641" height="228" alt="image" src="https://github.com/user-attachments/assets/780caf36-85c0-41aa-89b8-e73582fd01b0" />
+
+####
+
+## OWASP Top 10
+
+### A07 - Identification and Authentication Failures
+Mitigação através de:
+- Login Django
+- Controle de sessão
+- Logout seguro
+
+### A01 - Broken Access Control
+Mitigação através de:
+- Áreas protegidas por autenticação
+- Validação de usuário autenticado
+
+### A05 - Security Misconfiguration
+Mitigação através de:
+- DEBUG=False em produção
+- Uso de Secrets no GitHub
+- Proxy reverso Nginx
+
+
