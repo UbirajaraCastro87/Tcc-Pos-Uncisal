@@ -186,3 +186,52 @@ completas para apresentação privada ao professor.
 
 **Ubirajara Rodrigo Castro** — Pós-Graduação em Segurança da Informação e
 Análise Forense, UNCISAL.
+
+
+#### Comando para verificação 
+
+
+echo "===== SERVIDOR =====" && \
+hostname && \
+echo "" && \
+echo "===== SISTEMA OPERACIONAL =====" && \
+cat /etc/os-release | head -5 && \
+echo "" && \
+echo "===== NGINX =====" && \
+sudo systemctl status nginx --no-pager | head -10 && \
+echo "" && \
+echo "===== GUNICORN =====" && \
+sudo systemctl status gunicorn --no-pager | head -15 && \
+echo "" && \
+echo "===== FAIL2BAN =====" && \
+sudo fail2ban-client status sshd && \
+echo "" && \
+echo "===== DOMINIO =====" && \
+curl -I https://ubirajarauncisal.duckdns.org 2>/dev/null | head -5 && \
+echo "" && \
+echo "===== PORTA 8000 =====" && \
+sudo ss -tulpn | grep 8000 && \
+echo "" && \
+echo "===== GUNICORN PROCESSOS =====" && \
+ps aux | grep gunicorn | grep -v grep && \
+echo "" && \
+echo "===== GIT ULTIMOS COMMITS =====" && \
+cd ~/Tcc-Pos-Uncisal && git log --oneline -5 && \
+echo "" && \
+echo "===== WORKFLOW CI/CD =====" && \
+cat .github/workflows/deploy.yml && \
+echo "" && \
+echo "===== PYTHON =====" && \
+source .venv/bin/activate && python --version && \
+echo "" && \
+echo "===== MIGRATIONS =====" && \
+python manage.py showmigrations | tail -20 && \
+echo "" && \
+echo "===== USUARIOS =====" && \
+python manage.py shell -c "from django.contrib.auth.models import User; print('TOTAL DE USUARIOS:', User.objects.count())" && \
+echo "" && \
+echo "===== BANCO SQLITE =====" && \
+sqlite3 db.sqlite3 "select count(*) from auth_user;" && \
+echo "" && \
+echo "===== LOGS GUNICORN =====" && \
+sudo journalctl -u gunicorn -n 20 --no-pager
