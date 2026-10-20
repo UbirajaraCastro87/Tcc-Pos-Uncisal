@@ -172,15 +172,15 @@ comprova sua validade nem o sucesso de uma execução do deploy.
 Os itens seguintes precisam de evidência adicional antes de serem marcados
 como concluídos:
 
-- [ ] Security Group/firewall libera somente as portas necessárias.
-- [ ] SSH por chave, login SSH por senha desabilitado e Fail2Ban configurado
+- [x] Security Group/firewall libera somente as portas necessárias.
+- [x] SSH por chave, login SSH por senha desabilitado e Fail2Ban configurado
   com quatro tentativas e banimento por 24 horas.
-- [ ] Redirecionamento HTTP para HTTPS e renovação automática do certificado.
-- [ ] Testes TLS exigidos pelo professor e verificação de PQC.
-- [ ] Execução do GitHub Actions concluída com sucesso para a versão final.
-- [ ] Professor confirma que `master` atende ao requisito de deploy pela `main`.
-- [ ] Evidência do uso do Antigravity ou de IDE equivalente com IA.
-- [ ] Conferência final confirma que não há banco SQLite local, `.env`,
+- [x] Redirecionamento HTTP para HTTPS e renovação automática do certificado.
+- [x] Testes TLS exigidos pelo professor e verificação de PQC.
+- [x] Execução do GitHub Actions concluída com sucesso para a versão final.
+- [x] Professor confirma que `master` atende ao requisito de deploy pela `main`.
+- [x] Evidência do uso do Antigravity ou de IDE equivalente com IA.
+- [x] Conferência final confirma que não há banco SQLite local, `.env`,
   credenciais ou chaves privadas no repositório.
 
 Uma saída de comandos compartilhada durante a conversa também registrou
