@@ -41,4 +41,6 @@ class AuthLoginTests(TestCase):
             fetch_redirect_response=False,
         )
         self.assertNotIn("_auth_user_id", self.client.session)
-        self.assertFalse(UserAccessLog.objects.exists())
+
+        
+        self.assertFalse(UserAccessLog.objects.exists()) 
