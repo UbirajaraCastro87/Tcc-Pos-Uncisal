@@ -12,7 +12,7 @@ from .models import UserAccessLog
 from django.utils import timezone
 
 # ==========================================
-# 1. CLASSE DE LOGIN (Com Envio Real de E-mail 2FA)
+# 1. CLASSE DE LOGIN
 # ==========================================
 class AuthView(TemplateView):
     def get_context_data(self, **kwargs):
@@ -27,87 +27,25 @@ class AuthView(TemplateView):
         user = authenticate(request, username=usuario, password=senha)
 
         if user is not None:
-            request.session['pre_2fa_user_id'] = user.id
+            login(request, user)
+            request.session.save()
 
-            # Gera o código de 6 dígitos
-            codigo_2fa = str(random.randint(100000, 999999))
-            request.session['2fa_token'] = codigo_2fa
+            log_acesso = UserAccessLog.objects.create(
+                user=user,
+                username=user.username,
+                ip_address=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT')
+            )
+            request.session['access_log_id'] = log_acesso.id
 
-            # ENVIO REAL DE E-MAIL 2FA (Disparado pelo Django via SMTP)
-            assunto = "Seu Código de Verificação 2FA"
-            mensagem = f"Olá, {user.username}.\n\nSeu código de verificação de dois fatores é: {codigo_2fa}\n\nEste código expira em breve."
-            remetente = 'noreply@tccseguranca.com'
-            destinatario = [user.email]
-
-            try:
-                send_mail(assunto, mensagem, remetente, destinatario, fail_silently=False)
-                print(f"📧 E-mail de 2FA disparado com sucesso para: {user.email}")
-            except Exception as e:
-                print(f"❌ Erro ao enviar e-mail: {e}")
-
-            return redirect('auth-2fa-validacao')
+            return redirect('user-logs')
         else:
             messages.error(request, "Credenciais inválidas. Verifique seu e-mail e senha.")
             return redirect(request.path)
 
 
 # ==========================================
-# 2. CLASSE DE VALIDAÇÃO 2FA & REGISTRO DE LOG
-# ==========================================
-class Auth2FAView(TemplateView):
-    def get_context_data(self, **kwargs):
-        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
-        context.update({"layout_path": TemplateHelper.set_layout("layout_blank.html", context)})
-        return context
-
-    def post(self, request, *args, **kwargs):
-        codigo_digitado = request.POST.get('codigo_2fa')
-
-        codigo_salvo = request.session.get('2fa_token')
-        user_id = request.session.get('pre_2fa_user_id')
-
-        if not user_id or not codigo_salvo:
-            messages.error(request, "Sessão expirada ou inválida. Faça login novamente.")
-            return redirect('auth-login-basic')
-
-        # Compara como string para evitar erros de tipo
-        if str(codigo_digitado) == str(codigo_salvo):
-            try:
-                user = User.objects.get(id=user_id)
-
-                # Efetiva o login oficial do Django
-                login(request, user)
-
-                # FORÇA A GRAVAÇÃO DA SESSÃO NO NAVEGADOR
-                request.session.save()
-
-                # Limpa os dados temporários de 2FA
-                del request.session['2fa_token']
-                del request.session['pre_2fa_user_id']
-
-                print("✅ 2FA APROVADO COM SUCESSO! Redirecionando para o painel...")
-
-                # CRIA O LOG DE AUDITORIA DE ACESSO NO BANCO DE DADOS
-                log_acesso = UserAccessLog.objects.create(
-                    user=user,
-                    username=user.username,
-                    ip_address=request.META.get('REMOTE_ADDR'),
-                    user_agent=request.META.get('HTTP_USER_AGENT')
-                )
-                request.session['access_log_id'] = log_acesso.id
-
-                return redirect('index')
-
-            except User.DoesNotExist:
-                messages.error(request, "Erro crítico. Usuário não encontrado.")
-                return redirect('auth-login-basic')
-        else:
-            messages.error(request, "Código 2FA incorreto. Tente novamente.")
-            return redirect(request.path)
-
-
-# ==========================================
-# 3. CLASSE DE LOGOUT (Calcula o tempo ativo)
+# 2. CLASSE DE LOGOUT (Calcula o tempo ativo)
 # ==========================================
 class AuthLogoutView(TemplateView):
     def get(self, request, *args, **kwargs):
@@ -140,7 +78,7 @@ class AuthLogoutView(TemplateView):
 
 
 # ==========================================
-# 4. CLASSE DE DISPARO DE EMAIL RECUPERAÇÃO DE SENHA
+# 3. CLASSE DE DISPARO DE EMAIL RECUPERAÇÃO DE SENHA
 # ==========================================
 class AuthForgotPasswordView(TemplateView):
     def get_context_data(self, **kwargs):
@@ -183,7 +121,7 @@ class AuthForgotPasswordView(TemplateView):
 
 
 # ==========================================
-# 5. CLASSE DE REDEFINIÇÃO DE SENHA
+# 4. CLASSE DE REDEFINIÇÃO DE SENHA
 # ==========================================
 class AuthResetPasswordView(TemplateView):
     def get_context_data(self, **kwargs):
@@ -227,7 +165,7 @@ class AuthResetPasswordView(TemplateView):
 
 
 # ==========================================
-# 6. CLASSE DE CADASTRO DE USUÁRIO (Restrita a Internos / Administradores)
+# 5. CLASSE DE CADASTRO DE USUÁRIO (Restrita a Internos / Administradores)
 # ==========================================
 class AuthAddUserView(LoginRequiredMixin, TemplateView):
     login_url = '/auth/login/'
@@ -277,7 +215,7 @@ from .models import UserAccessLog
 
 
 # ==========================================
-# 7. CLASSE DE VISUALIZAÇÃO DE LOGS DE ACESSO
+# 6. CLASSE DE VISUALIZAÇÃO DE LOGS DE ACESSO
 # ==========================================
 class UserLogsView(LoginRequiredMixin, TemplateView):
     login_url = '/auth/login/'
