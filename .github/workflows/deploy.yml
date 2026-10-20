@@ -23,6 +23,17 @@ jobs:
 
             git pull origin master
 
+            touch .env
+            if ! grep -qE '^[[:space:]]*SECRET_KEY[[:space:]]*=[[:space:]]*[^[:space:]]' .env; then
+              printf '\nSECRET_KEY=%s\n' "$(openssl rand -hex 48)" >> .env
+            fi
+            if grep -qE '^[[:space:]]*DEBUG[[:space:]]*=' .env; then
+              sed -i -E 's/^[[:space:]]*DEBUG[[:space:]]*=.*/DEBUG=False/' .env
+            else
+              printf '\nDEBUG=False\n' >> .env
+            fi
+            chmod 600 .env
+
             source .venv/bin/activate
 
             pip install -r requirements.txt

@@ -9,12 +9,11 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-import os
-import random
-import string
 from pathlib import Path
 
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
+from django.core.management.utils import get_random_secret_key
 
 from .template import  THEME_LAYOUT_DIR, THEME_VARIABLES
 
@@ -25,30 +24,30 @@ load_dotenv()  # take environment variables from .env.
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-
-# Update secret key in .env file and .env.prod file
-# SECRET_KEY = os.environ.get("SECRET_KEY", default='')
-
-# SECURITY WARNING: keep the secret key used in production secret!
-# If using the .env file for SECRET_KEY then comment below random SECRET_KEY generation code.
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY", default="")
 if not SECRET_KEY:
-    SECRET_KEY = "".join(random.choice(string.ascii_lowercase) for i in range(32))
+    if not DEBUG:
+        raise ImproperlyConfigured("SECRET_KEY must be set when DEBUG is False.")
+    SECRET_KEY = get_random_secret_key()
 
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", 'True').lower() in ['true', 'yes', '1']
-
-
-# https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1","3.22.187.235",
-    "ubirajarauncisal.duckdns.org", "*"]
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in config(
+        "ALLOWED_HOSTS",
+        default="localhost,127.0.0.1,0.0.0.0,3.22.187.235,ubirajarauncisal.duckdns.org",
+    ).split(",")
+    if host.strip()
+]
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in config("CSRF_TRUSTED_ORIGINS", default="").split(",")
+    if origin.strip()
+]
 
 # Current DJANGO_ENVIRONMENT
-ENVIRONMENT = os.environ.get("DJANGO_ENVIRONMENT", default="local")
+ENVIRONMENT = config("DJANGO_ENVIRONMENT", default="local")
 
 
 # Application definition
@@ -169,7 +168,25 @@ STATICFILES_DIRS = [
 ]
 
 # Default URL on which Django application runs for specific environment
-BASE_URL = os.environ.get("BASE_URL", default="http://127.0.0.1:8000")
+BASE_URL = config("BASE_URL", default="http://127.0.0.1:8000")
+
+SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=not DEBUG, cast=bool)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_HSTS_SECONDS = config(
+    "SECURE_HSTS_SECONDS",
+    default=31536000 if not DEBUG else 0,
+    cast=int,
+)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SAMESITE = "Lax"
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+X_FRAME_OPTIONS = "DENY"
 
 
 # Default primary key field type
@@ -187,19 +204,22 @@ THEME_VARIABLES = THEME_VARIABLES
 
 # Your stuff...
 # ------------------------------------------------------------------------------
-# Configuração de E-mail
-# Em desenvolvimento local, usamos o console para não precisar de senha de app real.
-# Em produção (Oracle VPS), alteraremos para 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_BACKEND = 'django.core.mail.backends.console.email.EmailBackend'
+# E-mail local usa o console; produção exige SMTP configurado.
+EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+DEFAULT_FROM_EMAIL = config(
+    "DEFAULT_FROM_EMAIL",
+    default="",
+) or EMAIL_HOST_USER or "webmaster@localhost"
 
-
-# Configuração de E-mail (SMTP Real com Gmail)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-
-# O decouple lê automaticamente do arquivo .env localizado na raiz do projeto
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+elif DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    raise ImproperlyConfigured(
+        "EMAIL_HOST_USER and EMAIL_HOST_PASSWORD must be set when DEBUG is False."
+    )

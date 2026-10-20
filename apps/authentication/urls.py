@@ -20,14 +20,13 @@ urlpatterns = [
         AuthResetPasswordView.as_view(template_name="auth_reset_password_basic.html"),
         name="auth-reset-password",
     ),
-# Rota para Adicionar Novo Usuário
+    # Rota para Adicionar Novo Usuário
     path(
         "auth/add_user/",
         AuthAddUserView.as_view(template_name="auth_add_user.html"),
         name="auth-add-user",
     ),
-
-path(
+    path(
         "dashboard/logs/",
         UserLogsView.as_view(),
         name="user-logs",
