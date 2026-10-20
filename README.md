@@ -1,4 +1,4 @@
-<img width="1784" height="2268" alt="image" src="https://github.com/user-attachments/assets/0a95a53b-1ec1-4e9f-a575-eaec6b6fd561" /># Sistema de autenticação — TCC
+# Sistema de autenticação — TCC
 
 Aplicação web desenvolvida para a disciplina **Projeto Aplicado: Práticas de
 Mercado** da Pós-Graduação em Segurança da Informação e Análise Forense da
