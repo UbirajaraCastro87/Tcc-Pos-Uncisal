@@ -1,4 +1,4 @@
-# Sistema de Autenticação Segura com MFA (TCC)
+# Sistema de Autenticação  (TCC)
 
 Este repositório contém o desenvolvimento de um sistema web seguro para autenticação de usuários, desenvolvido como requisito da disciplina **Projeto Aplicado: Práticas de Mercado** da Pós-Graduação em Segurança da Informação e Análise Forense da UNCISAL.
 
@@ -273,4 +273,3 @@ Tcc-Pos-Uncisal/
 Projeto desenvolvido para fins acadêmicos como requisito parcial para conclusão da Pós-Graduação em Segurança da Informação e Análise Forense - UNCISAL.
 
 ---
-
